@@ -1,0 +1,75 @@
+{
+  "entities": {
+    "AssetLabel": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AssetLabel",
+      "type": "object",
+      "description": "Represents an asset label with all its associated details.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Asset Label."
+        },
+        "companyName": {
+          "type": "string",
+          "description": "The name of the company associated with the asset."
+        },
+        "assetTag": {
+          "type": "string",
+          "description": "The asset tag identifier."
+        },
+        "make": {
+          "type": "string",
+          "description": "The make or manufacturer of the asset."
+        },
+        "model": {
+          "type": "string",
+          "description": "The model name or number of the asset."
+        },
+        "serialNumber": {
+          "type": "string",
+          "description": "The serial number of the asset."
+        },
+        "barcodeData": {
+          "type": "string",
+          "description": "The data encoded in the barcode, typically the asset tag or serial number."
+        }
+      },
+      "required": [
+        "id",
+        "companyName",
+        "assetTag",
+        "make",
+        "model",
+        "serialNumber"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/assetLabels/{assetLabelId}",
+        "definition": {
+          "entityName": "AssetLabel",
+          "schema": {
+            "$ref": "#/backend/entities/AssetLabel"
+          },
+          "description": "Stores asset label data. Uses a flat structure for simplicity. No denormalized fields are needed due to the flat structure and lack of user-specific ownership.",
+          "params": [
+            {
+              "name": "assetLabelId",
+              "description": "Unique identifier for each asset label."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The data structure prioritizes a flat collection for `assetLabels` due to the absence of user-specific or hierarchical ownership. This simplifies security rules and queries.  Authorization Independence is inherently achieved as there are no parent-child relationships requiring `get()` calls. QAPs are directly supported, as listing asset labels is straightforward without complex filtering based on implicit relationships."
+  }
+}

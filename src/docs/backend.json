@@ -1,0 +1,224 @@
+
+{
+  "entities": {
+    "User": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "User",
+        "type": "object",
+        "description": "Represents a user account in the system.",
+        "properties": {
+            "id": { "type": "string", "description": "Unique identifier for the User, same as their Firebase Auth UID." },
+            "name": { "type": "string", "description": "The user's full name." },
+            "email": { "type": "string", "format": "email", "description": "The user's email address." },
+            "phone": { "type": "string", "description": "The user's phone number." },
+            "role": { "type": "string", "enum": ["SuperAdmin", "TenantAdmin"], "description": "The user's role within their tenant." },
+            "status": { "type": "string", "enum": ["Active", "Inactive"], "description": "The status of the user account." },
+            "tenantId": { "type": "string", "description": "The unique identifier for the tenant the user belongs to." }
+        },
+        "required": ["id", "name", "email", "role", "status", "tenantId"]
+    },
+    "Asset": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Asset",
+      "type": "object",
+      "description": "Represents a company asset with all its associated details.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Asset entity." },
+        "make": { "type": "string", "description": "The make or manufacturer of the asset." },
+        "model": { "type": "string", "description": "The model name or number of the asset." },
+        "assetTag": { "type": "string", "description": "The asset tag identifier." },
+        "serialNumber": { "type": "string", "description": "The serial number of the asset." },
+        "purchaseFrom": { "type": "string", "description": "The vendor from whom the asset was purchased." },
+        "ownership": { "type": "string", "enum": ["Own", "Rented"], "description": "Ownership status of the asset." },
+        "processor": { "type": "string", "description": "The processor details of the asset." },
+        "ram": { "type": "string", "description": "The RAM details of the asset." },
+        "storage": { "type": "string", "description": "The storage details of the asset." },
+        "assetType": { "type": "string", "description": "The type of the asset (e.g., Laptop, Monitor)." },
+        "comments": { "type": "array", "items": { "$ref": "#/entities/Comment" } },
+        "auditLog": { "type": "array", "items": { "$ref": "#/entities/AuditLog" } },
+        "assignedTo": { "type": ["string", "null"], "description": "The ID of the employee this asset is assigned to." },
+        "status": {
+          "type": "string",
+          "enum": ["Available", "Assigned", "Donated", "E-Waste"],
+          "description": "The current status of the asset.",
+          "default": "Available"
+        }
+      },
+      "required": ["id", "make", "model", "assetTag", "serialNumber", "assetType", "ownership", "status"]
+    },
+    "Employee": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Employee",
+      "type": "object",
+      "description": "Represents an employee with their details.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Employee entity." },
+        "employeeId": { "type": "string", "description": "The unique ID assigned to the employee." },
+        "name": { "type": "string", "description": "Full name of the employee." },
+        "department": { "type": "string", "description": "The department the employee belongs to." },
+        "designation": { "type": "string", "description": "The job title or role of the employee." },
+        "email": { "type": "string", "format": "email", "description": "The employee's email address." },
+        "phone": { "type": "string", "description": "The employee's phone number." },
+        "joiningDate": { "type": "string", "format": "date", "description": "The date the employee joined the company." },
+        "status": { "type": "string", "enum": ["Active", "Inactive"], "description": "The current employment status of the employee." },
+        "comments": { "type": "array", "items": { "$ref": "#/entities/Comment" } },
+        "auditLog": { "type": "array", "items": { "$ref": "#/entities/AuditLog" } },
+        "exitDate": { "type": ["string", "null"], "format": "date", "description": "The date the employee exited the company." },
+        "exitReason": { "type": ["string", "null"], "description": "The reason for the employee's exit." }
+      },
+      "required": ["id", "employeeId", "name", "department", "designation", "email", "joiningDate", "status"]
+    },
+    "Vendor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Vendor",
+      "type": "object",
+      "description": "Represents a vendor or supplier.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Vendor entity." },
+        "name": { "type": "string", "description": "Name of the vendor." },
+        "contactPerson": { "type": "string", "description": "Primary contact person at the vendor." },
+        "email": { "type": "string", "format": "email", "description": "Contact email of the vendor." },
+        "phone": { "type": "string", "description": "Contact phone number of the vendor." },
+        "address": { "type": "string", "description": "Physical address of the vendor." },
+        "website": { "type": "string", "format": "uri", "description": "The vendor's website." },
+        "products": { "type": "array", "items": { "type": "string" }, "description": "List of products or services supplied." },
+        "auditLog": { "type": "array", "items": { "$ref": "#/entities/AuditLog" } }
+      },
+      "required": ["id", "name"]
+    },
+    "Software": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Software",
+      "type": "object",
+      "description": "Represents a software license and its details.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Software entity." },
+        "name": { "type": "string", "description": "Name of the software." },
+        "version": { "type": "string", "description": "Version or edition of the software." },
+        "licenseKey": { "type": "string", "description": "License key or product ID." },
+        "vendorId": { "type": ["string", "null"], "description": "ID of the vendor from whom it was purchased." },
+        "purchaseDate": { "type": "string", "format": "date", "description": "Date the software was purchased." },
+        "expiryDate": { "type": ["string", "null"], "format": "date", "description": "Date the license expires or needs renewal." },
+        "totalLicenses": { "type": "number", "description": "Total number of licenses available." },
+        "licenseType": { "type": "string", "enum": ["Per User", "Per Device", "Subscription", "Perpetual"], "description": "Type of the license." },
+        "ownership": { "type": "string", "enum": ["Purchased", "Rented", "Freeware"], "description": "Ownership status of the software license." },
+        "status": { "type": "string", "enum": ["Active", "Expired", "Renewed"], "description": "Current status of the license." },
+        "attachments": { "type": "array", "items": { "type": "string" }, "description": "Names of uploaded attachments like invoices or documents." },
+        "assignedTo": { "type": "array", "items": { "type": "string" }, "description": "Array of employee IDs this software is assigned to." },
+        "auditLog": { "type": "array", "items": { "$ref": "#/entities/AuditLog" } }
+      },
+      "required": ["id", "name", "purchaseDate", "totalLicenses", "licenseType", "ownership", "status"]
+    },
+    "Award": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Award",
+      "type": "object",
+      "description": "Represents an employee award.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Award entity." },
+        "name": { "type": "string", "description": "Name of the award (e.g., Service Excellence Award)." },
+        "type": { "type": "string", "enum": ["Monthly", "Quarterly", "Annual", "Spot Award"], "description": "The frequency or type of the award." },
+        "employeeId": { "type": "string", "description": "The ID of the employee receiving the award." },
+        "department": { "type": "string", "description": "The department of the awarded employee (denormalized)." },
+        "awardDate": { "type": "string", "format": "date", "description": "The date the award was given." },
+        "awardedBy": { "type": "string", "description": "Name or role of the person/entity giving the award." },
+        "reason": { "type": "string", "description": "A description of why the award was given." },
+        "certificateTemplate": { "type": "string", "description": "Identifier for the visual template of the certificate." },
+        "isLocked": { "type": "boolean", "description": "Indicates if the award record is locked from editing.", "default": false }
+      },
+      "required": ["id", "name", "type", "employeeId", "awardDate", "awardedBy", "reason"]
+    },
+    "Consumable": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Consumable",
+      "type": "object",
+      "description": "Represents a consumable item with its stock details.",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the Consumable item." },
+        "name": { "type": "string", "description": "Name of the consumable item (e.g., HDMI Cable)." },
+        "category": { "type": "string", "description": "Category of the item (e.g., Cable, Peripheral)." },
+        "quantity": { "type": "number", "description": "Total available stock quantity." },
+        "unitType": { "type": "string", "description": "Unit of measurement (e.g., pcs, box)." },
+        "purchaseDate": { "type": "string", "format": "date", "description": "Date the batch was purchased." },
+        "vendorId": { "type": ["string", "null"], "description": "ID of the vendor from whom it was purchased." },
+        "costPerItem": { "type": "number", "description": "Optional cost per item for reporting." },
+        "remarks": { "type": "string", "description": "Notes or reference information." },
+        "auditLog": { "type": "array", "items": { "$ref": "#/entities/AuditLog" } },
+        "issueLog": { "type": "array", "items": { "$ref": "#/entities/IssueLog" } }
+      },
+      "required": ["id", "name", "category", "quantity", "unitType", "purchaseDate"]
+    },
+    "IssueLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "IssueLog",
+      "type": "object",
+      "description": "Represents a log entry for a consumable item being issued.",
+      "properties": {
+        "id": { "type": "string" },
+        "employeeId": { "type": "string", "description": "ID of the employee the item was issued to." },
+        "quantity": { "type": "number", "description": "Quantity of the item issued." },
+        "issueDate": { "type": "string", "format": "date-time" },
+        "remarks": { "type": "string" }
+      },
+      "required": ["id", "employeeId", "quantity", "issueDate"]
+    },
+    "Comment": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Comment",
+        "type": "object",
+        "properties": {
+            "id": { "type": "string" },
+            "text": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "text", "date"]
+    },
+    "AuditLog": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "AuditLog",
+        "type": "object",
+        "properties": {
+            "id": { "type": "string" },
+            "action": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" },
+            "details": { "type": "string" }
+        },
+        "required": ["id", "action", "date", "details"]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password"
+    ]
+  },
+  "firestore": {
+    "/tenants/{tenantId}/assets/{assetId}": {
+      "schema": { "$ref": "#/entities/Asset" },
+      "description": "Stores all assets for an organization."
+    },
+    "/tenants/{tenantId}/employees/{employeeId}": {
+      "schema": { "$ref": "#/entities/Employee" },
+      "description": "Stores all employees for an organization."
+    },
+    "/tenants/{tenantId}/vendors/{vendorId}": {
+      "schema": { "$ref": "#/entities/Vendor" },
+      "description": "Stores all vendors for an organization."
+    },
+    "/tenants/{tenantId}/software/{softwareId}": {
+      "schema": { "$ref": "#/entities/Software" },
+      "description": "Stores all software licenses for an organization."
+    },
+    "/tenants/{tenantId}/awards/{awardId}": {
+      "schema": { "$ref": "#/entities/Award" },
+      "description": "Stores all employee awards for an organization."
+    },
+    "/tenants/{tenantId}/consumables/{consumableId}": {
+      "schema": { "$ref": "#/entities/Consumable" },
+      "description": "Stores all consumable items for an organization."
+    },
+     "/tenants/{tenantId}/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user profiles for an organization's tenant."
+    }
+  }
+}

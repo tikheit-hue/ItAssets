@@ -1,0 +1,62 @@
+/**
+ * @fileoverview Firestore Security Rules for Prototyping.
+ *
+ * Core Philosophy:
+ * This ruleset allows public read access to all data, but restricts write access to authenticated users.
+ * This is suitable for rapid prototyping where data validation is less important than quickly building functionality.
+ *
+ * Data Structure:
+ * The data structure is flat.
+ *
+ * Key Security Decisions:
+ * - Public read access is granted to all collections.
+ * - Write access is restricted to authenticated users.
+ * - Data validation is minimal.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Root-level access control. Public read, authenticated write.
+     * @principle All read operations are public, all write operations require authentication.
+     */
+    match /{document=**} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+
+    /**
+     * @description AssetLabel data storage.
+     * @path /assetLabels/{assetLabelId}
+     * @allow (get, list)
+     * @allow (create)
+     * @allow (update, delete)
+     * @deny (create)
+     * @principle All read operations are public, all write operations require authentication.
+     */
+    match /assetLabels/{assetLabelId} {
+      allow get, list: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+
+    /**
+     * @description Vendors under a tenant.
+     * @path /tenants/{tenantId}/vendors/{vendorId}
+     */
+    match /tenants/{tenantId}/vendors/{vendorId} {
+        allow get: if isSignedIn();
+        allow list: if request.auth.uid == tenantId;
+        allow create: if isSignedIn() && request.auth.uid == tenantId;
+        allow update: if isSignedIn() && request.auth.uid == tenantId;
+        allow delete: if isSignedIn() && request.auth.uid == tenantId;
+    }
+
+    /**
+     * @description Signed-in users only.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+  }
+}
